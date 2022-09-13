@@ -15,14 +15,28 @@
   "license": "LGPL-3.0-or-later",
   "environment": "client",
   "entrypoints": {
-
+    "preLaunch": [
+      "com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
+    ]
   },
   "mixins": [
-    "fabric-mod-template.mixins.json"
+    "xanders-sodium-options.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.14.0",
     "minecraft": "1.19.x",
-    "java": ">=17"
+    "java": ">=17",
+    "sodium": "<0.5.0",
+    "yet-another-config-lib": ">=1.1.0"
+  },
+  "breaks": {
+    "reeses-sodium-options": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "parent": {
+        "id": "sodium"
+      }
+    }
   }
 }

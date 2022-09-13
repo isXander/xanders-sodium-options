@@ -16,6 +16,10 @@ version = "1.0.0"
 
 repositories {
     mavenCentral()
+    maven("https://maven.isxander.dev/releases")
+    maven("https://maven.flashyreese.me/snapshots")
+    maven("https://maven.terraformersmc.com")
+    maven("https://jitpack.io")
 }
 
 val minecraftVersion: String by project
@@ -24,8 +28,12 @@ val fabricLoaderVersion: String by project
 dependencies {
     minecraft("com.mojang:minecraft:$minecraftVersion")
     mappings("net.fabricmc:yarn:$minecraftVersion+build.+:v2")
-
     modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
+
+    modImplementation("dev.isxander:yet-another-config-lib:1.1.0")
+    modImplementation("me.jellysquid.mods:sodium-fabric:0.4.4+build.198")
+
+    modImplementation(include("com.github.llamalad7:mixinextras:0.0.12")!!)
 }
 
 tasks {
