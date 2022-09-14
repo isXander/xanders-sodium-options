@@ -1,5 +1,7 @@
 package dev.isxander.xso;
 
+import dev.isxander.xso.compat.Compat;
+import dev.isxander.xso.compat.SodiumExtraCompat;
 import dev.isxander.xso.mixins.SliderControlAccessor;
 import dev.isxander.xso.utils.ClassCapture;
 import dev.isxander.yacl.api.*;
@@ -64,7 +66,11 @@ public class XandersSodiumOptions {
 
         if (sodiumOption.getControl() instanceof SliderControl sliderControl) {
             SliderControlAccessor accessor = (SliderControlAccessor) sliderControl;
-            yaclOption.controller(opt -> new IntegerSliderController((Option<Integer>) opt, accessor.getMin(), accessor.getMax(), accessor.getInterval(), value -> Text.of(((SliderControlAccessor) sliderControl).getMode().format(value))));
+            yaclOption.controller(opt -> new IntegerSliderController((Option<Integer>) opt, accessor.getMin(), accessor.getMax(), accessor.getInterval(), value -> Text.of(accessor.getMode().format(value))));
+            return;
+        }
+
+        if (Compat.SODIUM_EXTRA && SodiumExtraCompat.convertControl(yaclOption, sodiumOption)) {
             return;
         }
 

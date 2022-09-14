@@ -17,9 +17,15 @@ version = "1.0.0"
 repositories {
     mavenCentral()
     maven("https://maven.isxander.dev/releases")
+    maven("https://maven.flashyreese.me/releases")
     maven("https://maven.flashyreese.me/snapshots")
     maven("https://maven.terraformersmc.com")
     maven("https://jitpack.io")
+    maven("https://api.modrinth.com/maven") {
+        content {
+            includeGroup("maven.modrinth")
+        }
+    }
 }
 
 val minecraftVersion: String by project
@@ -32,6 +38,9 @@ dependencies {
 
     modImplementation("dev.isxander:yet-another-config-lib:1.1.0")
     modImplementation("me.jellysquid.mods:sodium-fabric:0.4.4+build.198")
+    modImplementation("me.flashyreese.mods:sodium-extra-fabric:0.4.10+mc1.19.2-build.64") {
+        exclude(module = "reeses-sodium-options")
+    }
 
     modImplementation(include("com.github.llamalad7:mixinextras:0.0.12")!!)
 }
