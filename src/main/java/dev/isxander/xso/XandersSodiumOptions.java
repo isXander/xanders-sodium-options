@@ -10,16 +10,20 @@ import dev.isxander.yacl.gui.controllers.TickBoxController;
 import dev.isxander.yacl.gui.controllers.slider.IntegerSliderController;
 import me.jellysquid.mods.sodium.client.gui.options.OptionImpl;
 import me.jellysquid.mods.sodium.client.gui.options.OptionPage;
+import me.jellysquid.mods.sodium.client.gui.options.TextProvider;
 import me.jellysquid.mods.sodium.client.gui.options.control.CyclingControl;
 import me.jellysquid.mods.sodium.client.gui.options.control.SliderControl;
 import me.jellysquid.mods.sodium.client.gui.options.control.TickBoxControl;
+import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.TranslatableOption;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 public class XandersSodiumOptions {
     public static Screen wrapSodiumScreen(List<OptionPage> pages, Screen prevScreen) {
@@ -27,10 +31,27 @@ public class XandersSodiumOptions {
                 .title(Text.translatable("Sodium Options"));
 
         for (OptionPage page : pages) {
-            builder.category(ConfigCategory.createBuilder()
-                    .name(page.getName())
-                    .groups(page.getGroups().stream().map(group -> OptionGroup.createBuilder().options(group.getOptions().stream().map(opt -> convertOption((OptionImpl<?, ?>) opt)).collect(Collectors.toList())).build()).toList()).build());
+            ConfigCategory.Builder categoryBuilder = ConfigCategory.createBuilder()
+                    .name(page.getName());
+
+            for (me.jellysquid.mods.sodium.client.gui.options.OptionGroup group : page.getGroups()) {
+                OptionGroup.Builder groupBuilder = OptionGroup.createBuilder();
+
+                for (me.jellysquid.mods.sodium.client.gui.options.Option<?> option : group.getOptions()) {
+                    groupBuilder.option(convertOption((OptionImpl<?, ?>) option));
+                }
+
+                categoryBuilder.group(groupBuilder.build());
+            }
+
+            builder.category(categoryBuilder.build());
         }
+
+        builder.save(() -> {
+            Set<OptionStorage<?>> storages = new HashSet<>();
+            pages.stream().flatMap(s -> s.getOptions().stream()).forEach(opt -> storages.add(opt.getStorage()));
+            storages.forEach(OptionStorage::save);
+        });
 
         return builder.build().generateScreen(prevScreen);
     }
@@ -40,7 +61,8 @@ public class XandersSodiumOptions {
                 .name(sodiumOption.getName())
                 .tooltip(sodiumOption.getTooltip())
                 .flags(convertFlags(sodiumOption))
-                .binding(new SodiumBinding<>(sodiumOption));
+                .binding(new SodiumBinding<>(sodiumOption))
+                .available(sodiumOption.isAvailable());
 
         if (sodiumOption.getImpact() != null) {
             builder.tooltip(Text.translatable("sodium.options.performance_impact_string", sodiumOption.getImpact().getLocalizedName()).formatted(Formatting.GRAY));
@@ -60,7 +82,13 @@ public class XandersSodiumOptions {
         }
 
         if (sodiumOption.getControl() instanceof CyclingControl) {
-            yaclOption.controller(opt -> new EnumController((Option) opt));
+            yaclOption.controller(opt -> new EnumController((Option) opt, value -> {
+                if (value instanceof TextProvider textProvider)
+                    return textProvider.getLocalizedName();
+                if (value instanceof TranslatableOption translatableOption)
+                    return translatableOption.getText();
+                return Text.of(((Enum<?>) value).name());
+            }));
             return;
         }
 

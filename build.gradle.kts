@@ -17,6 +17,7 @@ version = "1.0.0"
 repositories {
     mavenCentral()
     maven("https://maven.isxander.dev/releases")
+    maven("https://maven.isxander.dev/snapshots")
     maven("https://maven.flashyreese.me/releases")
     maven("https://maven.flashyreese.me/snapshots")
     maven("https://maven.terraformersmc.com")
@@ -36,7 +37,7 @@ dependencies {
     mappings("net.fabricmc:yarn:$minecraftVersion+build.+:v2")
     modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
 
-    modImplementation("dev.isxander:yet-another-config-lib:1.1.0")
+    modImplementation("dev.isxander:yet-another-config-lib:1.2.0")
     modImplementation("me.jellysquid.mods:sodium-fabric:0.4.4+build.198")
     modImplementation("me.flashyreese.mods:sodium-extra-fabric:0.4.10+mc1.19.2-build.64") {
         exclude(module = "reeses-sodium-options")
