@@ -8,10 +8,16 @@
     "OptionImplBuilderMixin",
     "OptionImplMixin",
     "SliderControlAccessor",
-    "SliderControlExtAccessor"
+    "compat.moreculling.FloatSliderControlAccessor",
+    "compat.moreculling.IntSliderControlAccessor",
+    "compat.moreculling.MoreCullingOptionImplAccessor",
+    "compat.moreculling.MoreCullingOptionImplBuilderMixin",
+    "compat.moreculling.MoreCullingOptionImplMixin",
+    "compat.sodiumextra.SliderControlExtAccessor"
   ],
   "client": [
     "SodiumOptionsGUIAccessor",
-    "SodiumOptionsGUIMixin"
+    "SodiumOptionsGUIMixin",
+    "compat.iris.SodiumOptionsGUIMixin_iris"
   ]
 }

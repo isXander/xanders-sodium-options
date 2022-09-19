@@ -1,6 +1,8 @@
 package dev.isxander.xso;
 
 import dev.isxander.xso.compat.Compat;
+import dev.isxander.xso.compat.IrisCompat;
+import dev.isxander.xso.compat.MoreCullingCompat;
 import dev.isxander.xso.compat.SodiumExtraCompat;
 import dev.isxander.xso.mixins.SliderControlAccessor;
 import dev.isxander.xso.utils.ClassCapture;
@@ -8,7 +10,7 @@ import dev.isxander.yacl.api.*;
 import dev.isxander.yacl.gui.controllers.EnumController;
 import dev.isxander.yacl.gui.controllers.TickBoxController;
 import dev.isxander.yacl.gui.controllers.slider.IntegerSliderController;
-import me.jellysquid.mods.sodium.client.gui.options.OptionImpl;
+import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;
 import me.jellysquid.mods.sodium.client.gui.options.OptionPage;
 import me.jellysquid.mods.sodium.client.gui.options.TextProvider;
 import me.jellysquid.mods.sodium.client.gui.options.control.CyclingControl;
@@ -26,11 +28,20 @@ import java.util.List;
 import java.util.Set;
 
 public class XandersSodiumOptions {
-    public static Screen wrapSodiumScreen(List<OptionPage> pages, Screen prevScreen) {
+    public static Screen wrapSodiumScreen(SodiumOptionsGUI sodiumOptionsGUI, List<OptionPage> pages, Screen prevScreen) {
         YetAnotherConfigLib.Builder builder = YetAnotherConfigLib.createBuilder()
                 .title(Text.translatable("Sodium Options"));
 
         for (OptionPage page : pages) {
+            if (Compat.IRIS) {
+                ConfigCategory shaderPackPage = IrisCompat.replaceShaderPackPage(sodiumOptionsGUI, page);
+                if (shaderPackPage != null) {
+                    builder.category(shaderPackPage);
+                    continue;
+                }
+            }
+
+
             ConfigCategory.Builder categoryBuilder = ConfigCategory.createBuilder()
                     .name(page.getName());
 
@@ -38,7 +49,7 @@ public class XandersSodiumOptions {
                 OptionGroup.Builder groupBuilder = OptionGroup.createBuilder();
 
                 for (me.jellysquid.mods.sodium.client.gui.options.Option<?> option : group.getOptions()) {
-                    groupBuilder.option(convertOption((OptionImpl<?, ?>) option));
+                    groupBuilder.option(convertOption(option));
                 }
 
                 categoryBuilder.group(groupBuilder.build());
@@ -56,26 +67,29 @@ public class XandersSodiumOptions {
         return builder.build().generateScreen(prevScreen);
     }
 
-    private static <S, T> Option<T> convertOption(me.jellysquid.mods.sodium.client.gui.options.OptionImpl<S, T> sodiumOption) {
+    private static <S, T> Option<T> convertOption(me.jellysquid.mods.sodium.client.gui.options.Option<T> sodiumOption) {
         Option.Builder<T> builder = Option.createBuilder(((ClassCapture<T>) sodiumOption).getCapturedClass())
                 .name(sodiumOption.getName())
                 .tooltip(sodiumOption.getTooltip())
                 .flags(convertFlags(sodiumOption))
-                .binding(new SodiumBinding<>(sodiumOption))
+                .available(sodiumOption.isAvailable())
+                .binding(Compat.MORE_CULLING ? MoreCullingCompat.getBinding(sodiumOption) : new SodiumBinding<>(sodiumOption))
                 .available(sodiumOption.isAvailable());
 
         if (sodiumOption.getImpact() != null) {
             builder.tooltip(Text.translatable("sodium.options.performance_impact_string", sodiumOption.getImpact().getLocalizedName()).formatted(Formatting.GRAY));
         }
 
-        convertControl(builder, sodiumOption);
+        genericBuilder(builder, sodiumOption);
 
-        return builder.build();
+        Option<T> built = builder.build();
+        if (Compat.MORE_CULLING) MoreCullingCompat.addAvailableCheck(built, sodiumOption);
+        return built;
     }
 
     // nasty, nasty raw types to make the compiler not commit die
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static <S, T> void convertControl(Option.Builder yaclOption, OptionImpl<S, T> sodiumOption) {
+    private static <S, T> void genericBuilder(Option.Builder yaclOption, me.jellysquid.mods.sodium.client.gui.options.Option<T> sodiumOption) {
         if (sodiumOption.getControl() instanceof TickBoxControl) {
             yaclOption.controller(opt -> new TickBoxController((Option<Boolean>) opt));
             return;
@@ -99,6 +113,10 @@ public class XandersSodiumOptions {
         }
 
         if (Compat.SODIUM_EXTRA && SodiumExtraCompat.convertControl(yaclOption, sodiumOption)) {
+            return;
+        }
+
+        if (Compat.MORE_CULLING && MoreCullingCompat.convertControl(yaclOption, sodiumOption)) {
             return;
         }
 

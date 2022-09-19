@@ -20,6 +20,7 @@ repositories {
     maven("https://maven.isxander.dev/snapshots")
     maven("https://maven.flashyreese.me/releases")
     maven("https://maven.flashyreese.me/snapshots")
+    maven("https://maven.shedaniel.me")
     maven("https://maven.terraformersmc.com")
     maven("https://jitpack.io")
     maven("https://api.modrinth.com/maven") {
@@ -37,11 +38,15 @@ dependencies {
     mappings("net.fabricmc:yarn:$minecraftVersion+build.+:v2")
     modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
 
-    modImplementation("dev.isxander:yet-another-config-lib:1.2.0")
-    modImplementation("me.jellysquid.mods:sodium-fabric:0.4.4+build.198")
+    modImplementation("dev.isxander:yet-another-config-lib:1.4.0")
+    modImplementation("maven.modrinth:sodium:mc1.19.2-0.4.4")
     modImplementation("me.flashyreese.mods:sodium-extra-fabric:0.4.10+mc1.19.2-build.64") {
         exclude(module = "reeses-sodium-options")
     }
+    modImplementation("maven.modrinth:moreculling:v0.10.0")
+    modImplementation("maven.modrinth:iris:1.19.x-v1.3.1")
+
+    modRuntimeOnly("me.shedaniel.cloth:cloth-config-fabric:8.2.88")
 
     modImplementation(include("com.github.llamalad7:mixinextras:0.0.12")!!)
 }

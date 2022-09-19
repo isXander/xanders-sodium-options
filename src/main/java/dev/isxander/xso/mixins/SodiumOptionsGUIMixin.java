@@ -26,6 +26,6 @@ public abstract class SodiumOptionsGUIMixin extends Screen {
 
     @Inject(method = "init", at = @At("TAIL"))
     private void redirectToYACL(CallbackInfo ci) {
-        client.setScreen(XandersSodiumOptions.wrapSodiumScreen(pages, prevScreen));
+        client.setScreen(XandersSodiumOptions.wrapSodiumScreen((SodiumOptionsGUI) (Object) this, pages, prevScreen));
     }
 }

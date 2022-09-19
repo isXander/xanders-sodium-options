@@ -1,4 +1,4 @@
-package dev.isxander.xso.mixins;
+package dev.isxander.xso.mixins.compat.sodiumextra;
 
 import me.flashyreese.mods.sodiumextra.client.gui.options.control.SliderControlExtended;
 import me.jellysquid.mods.sodium.client.gui.options.control.ControlValueFormatter;
