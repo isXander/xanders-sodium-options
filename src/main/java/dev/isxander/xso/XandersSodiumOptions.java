@@ -67,7 +67,7 @@ public class XandersSodiumOptions {
         return builder.build().generateScreen(prevScreen);
     }
 
-    private static <S, T> Option<T> convertOption(me.jellysquid.mods.sodium.client.gui.options.Option<T> sodiumOption) {
+    private static <T> Option<T> convertOption(me.jellysquid.mods.sodium.client.gui.options.Option<T> sodiumOption) {
         Option.Builder<T> builder = Option.createBuilder(((ClassCapture<T>) sodiumOption).getCapturedClass())
                 .name(sodiumOption.getName())
                 .tooltip(sodiumOption.getTooltip())
@@ -89,7 +89,7 @@ public class XandersSodiumOptions {
 
     // nasty, nasty raw types to make the compiler not commit die
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static <S, T> void genericBuilder(Option.Builder yaclOption, me.jellysquid.mods.sodium.client.gui.options.Option<T> sodiumOption) {
+    private static <T> void genericBuilder(Option.Builder yaclOption, me.jellysquid.mods.sodium.client.gui.options.Option<T> sodiumOption) {
         if (sodiumOption.getControl() instanceof TickBoxControl) {
             yaclOption.controller(opt -> new TickBoxController((Option<Boolean>) opt));
             return;

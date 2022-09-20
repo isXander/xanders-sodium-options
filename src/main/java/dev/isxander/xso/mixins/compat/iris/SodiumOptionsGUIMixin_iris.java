@@ -5,7 +5,7 @@ import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;
 import me.jellysquid.mods.sodium.client.gui.options.OptionPage;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(SodiumOptionsGUI.class)
+@Mixin(value = SodiumOptionsGUI.class, priority = 2000)
 public class SodiumOptionsGUIMixin_iris implements IrisCompat.ShaderPageHolder {
     private OptionPage shaderPacks;
 
