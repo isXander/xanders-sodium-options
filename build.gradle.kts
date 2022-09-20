@@ -118,6 +118,12 @@ if (modrinthId.isNotEmpty()) {
         loaders.set(listOf("fabric", "quilt"))
         changelog.set(changelogText)
         syncBodyFrom.set(file(".github/README.md").readText())
+
+        dependencies {
+            required.project("sodium")
+            required.project("yacl")
+            incompatible.project("reeses-sodium-options")
+        }
     }
 }
 
@@ -140,6 +146,12 @@ if (hasProperty("curseforge.token") && curseforgeId.isNotEmpty()) {
 
             changelog = changelogText
             changelogType = "markdown"
+
+            relations(closureOf<me.hypherionmc.cursegradle.CurseRelation> {
+                requiredDependency("sodium")
+                requiredDependency("yacl")
+                incompatible("reeses-sodium-options")
+            })
         })
 
         options(closureOf<me.hypherionmc.cursegradle.Options> {
