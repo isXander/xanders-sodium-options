@@ -3,7 +3,9 @@
   "required": true,
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [
+  "client": [
+    "SodiumOptionsGUIAccessor",
+    "SodiumOptionsGUIMixin",
     "OptionImplAccessor",
     "OptionImplBuilderMixin",
     "OptionImplMixin",
@@ -13,12 +15,8 @@
     "compat.moreculling.MoreCullingOptionImplAccessor",
     "compat.moreculling.MoreCullingOptionImplBuilderMixin",
     "compat.moreculling.MoreCullingOptionImplMixin",
-    "compat.sodiumextra.SliderControlExtAccessor"
-  ],
-  "client": [
-    "SodiumOptionsGUIAccessor",
-    "SodiumOptionsGUIMixin",
-    "compat.iris.SodiumOptionsGUIMixin_iris",
-    "compat.sodiumextra.SuggestRSOScreenMixin"
+    "compat.sodiumextra.SliderControlExtAccessor",
+    "compat.sodiumextra.SodiumExtraGameOptionsMixins",
+    "compat.iris.SodiumOptionsGUIMixin_iris"
   ]
 }

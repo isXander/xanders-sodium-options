@@ -40,10 +40,14 @@ dependencies {
 
     modImplementation("dev.isxander:yet-another-config-lib:1.4.0")
     modImplementation("maven.modrinth:sodium:mc1.19.2-0.4.4")
+
+    // sodium extra compat
     modImplementation("me.flashyreese.mods:sodium-extra-fabric:0.4.10+mc1.19.2-build.64") {
         exclude(module = "reeses-sodium-options")
     }
+    // moreculling compat
     modImplementation("maven.modrinth:moreculling:v0.10.0")
+    // iris compat
     modImplementation("maven.modrinth:iris:1.19.x-v1.3.1")
 
     modRuntimeOnly("me.shedaniel.cloth:cloth-config-fabric:8.2.88")
@@ -113,7 +117,7 @@ if (modrinthId.isNotEmpty()) {
         gameVersions.set(listOf("1.19", "1.19.1", "1.19.2"))
         loaders.set(listOf("fabric", "quilt"))
         changelog.set(changelogText)
-        syncBodyFrom.set(file("README.md").readText())
+        syncBodyFrom.set(file(".github/README.md").readText())
     }
 }
 
@@ -160,8 +164,8 @@ githubRelease {
 publishing {
     publications {
         create<MavenPublication>("mod") {
-            groupId = group.toString()
-            artifactId = base.archivesName.get()
+            groupId = "dev.isxander"
+            artifactId = "xanders-sodium-options"
 
             from(components["java"])
         }
