@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "dev.isxander"
-version = "1.0.0"
+version = "1.0.1"
 
 repositories {
     mavenCentral()
@@ -38,7 +38,7 @@ dependencies {
     mappings("net.fabricmc:yarn:$minecraftVersion+build.+:v2")
     modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
 
-    modImplementation("dev.isxander:yet-another-config-lib:1.4.0")
+    modImplementation("dev.isxander:yet-another-config-lib:1.5.0")
     modImplementation("maven.modrinth:sodium:mc1.19.2-0.4.4")
 
     // sodium extra compat

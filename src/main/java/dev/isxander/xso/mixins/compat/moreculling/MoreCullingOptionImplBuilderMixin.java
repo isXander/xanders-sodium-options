@@ -4,9 +4,11 @@ import ca.fxco.moreculling.config.sodium.MoreCullingOptionImpl;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import dev.isxander.xso.utils.ClassCapture;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
+@Pseudo
 @Mixin(MoreCullingOptionImpl.Builder.class)
 public class MoreCullingOptionImplBuilderMixin<S, T> implements ClassCapture<T> {
     @Unique

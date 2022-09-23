@@ -7,11 +7,13 @@ import dev.isxander.xso.utils.ClassCapture;
 import dev.isxander.yacl.api.Option;
 import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+@Pseudo
 @Mixin(value = MoreCullingOptionImpl.class, remap = false)
 public abstract class MoreCullingOptionImplMixin<S, T> implements ClassCapture<T>, MoreCullingCompat.OptionHolder<T> {
     @Unique

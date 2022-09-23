@@ -4,6 +4,7 @@ import dev.isxander.xso.compat.Compat;
 import dev.isxander.xso.compat.IrisCompat;
 import dev.isxander.xso.compat.MoreCullingCompat;
 import dev.isxander.xso.compat.SodiumExtraCompat;
+import dev.isxander.xso.mixins.CyclingControlAccessor;
 import dev.isxander.xso.mixins.SliderControlAccessor;
 import dev.isxander.xso.utils.ClassCapture;
 import dev.isxander.yacl.api.*;
@@ -41,7 +42,6 @@ public class XandersSodiumOptions {
                 }
             }
 
-
             ConfigCategory.Builder categoryBuilder = ConfigCategory.createBuilder()
                     .name(page.getName());
 
@@ -54,6 +54,9 @@ public class XandersSodiumOptions {
 
                 categoryBuilder.group(groupBuilder.build());
             }
+
+            if (Compat.MORE_CULLING)
+                MoreCullingCompat.extendMoreCullingPage(sodiumOptionsGUI, page, categoryBuilder);
 
             builder.category(categoryBuilder.build());
         }
@@ -80,7 +83,7 @@ public class XandersSodiumOptions {
             builder.tooltip(Text.translatable("sodium.options.performance_impact_string", sodiumOption.getImpact().getLocalizedName()).formatted(Formatting.GRAY));
         }
 
-        genericBuilder(builder, sodiumOption);
+        addController(builder, sodiumOption);
 
         Option<T> built = builder.build();
         if (Compat.MORE_CULLING) MoreCullingCompat.addAvailableCheck(built, sodiumOption);
@@ -89,20 +92,20 @@ public class XandersSodiumOptions {
 
     // nasty, nasty raw types to make the compiler not commit die
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static <T> void genericBuilder(Option.Builder yaclOption, me.jellysquid.mods.sodium.client.gui.options.Option<T> sodiumOption) {
+    private static <T> void addController(Option.Builder yaclOption, me.jellysquid.mods.sodium.client.gui.options.Option<T> sodiumOption) {
         if (sodiumOption.getControl() instanceof TickBoxControl) {
             yaclOption.controller(opt -> new TickBoxController((Option<Boolean>) opt));
             return;
         }
 
-        if (sodiumOption.getControl() instanceof CyclingControl) {
+        if (sodiumOption.getControl() instanceof CyclingControl cyclingControl) {
             yaclOption.controller(opt -> new EnumController((Option) opt, value -> {
                 if (value instanceof TextProvider textProvider)
                     return textProvider.getLocalizedName();
                 if (value instanceof TranslatableOption translatableOption)
                     return translatableOption.getText();
                 return Text.of(((Enum<?>) value).name());
-            }));
+            }, ((CyclingControlAccessor<?>) cyclingControl).getAllowedValues()));
             return;
         }
 
