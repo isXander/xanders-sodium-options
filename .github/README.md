@@ -20,7 +20,7 @@ Replaces Sodium Options with a Minecraft-style alternative.
 </div></center>
 
 
-## Why was this mod vreated?
+## Why was this mod created?
 
 I noticed that people have tended to lean towards a Minecraft-style GUI (due to OptiFine's vanilla GUI video settings menu) over a more modern interface,
 so this is why I decided to create this mod. It also contains all the features of [YACL](https://github.com/isXander/YetAnotherConfigLib),
