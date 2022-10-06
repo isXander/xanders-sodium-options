@@ -41,14 +41,16 @@ dependencies {
     modImplementation("dev.isxander:yet-another-config-lib:1.5.0")
     modImplementation("maven.modrinth:sodium:mc1.19.2-0.4.4")
 
-    // sodium extra compat
+    // sodium extra better options compat
     modImplementation("me.flashyreese.mods:sodium-extra-fabric:0.4.10+mc1.19.2-build.64") {
         exclude(module = "reeses-sodium-options")
     }
-    // moreculling compat
+    // moreculling category placement
     modImplementation("maven.modrinth:moreculling:v0.10.0")
-    // iris compat
+    // iris category placement
     modImplementation("maven.modrinth:iris:1.19.x-v1.3.1")
+    // entityviewdistance button option compat
+    modImplementation("maven.modrinth:entity-view-distance:1.0.2+1.19")
 
     modRuntimeOnly("me.shedaniel.cloth:cloth-config-fabric:8.2.88")
 

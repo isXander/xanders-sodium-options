@@ -1,13 +1,11 @@
 package dev.isxander.xso;
 
-import dev.isxander.xso.compat.Compat;
-import dev.isxander.xso.compat.IrisCompat;
-import dev.isxander.xso.compat.MoreCullingCompat;
-import dev.isxander.xso.compat.SodiumExtraCompat;
+import dev.isxander.xso.compat.*;
 import dev.isxander.xso.mixins.CyclingControlAccessor;
 import dev.isxander.xso.mixins.SliderControlAccessor;
 import dev.isxander.xso.utils.ClassCapture;
 import dev.isxander.yacl.api.*;
+import dev.isxander.yacl.gui.controllers.ActionController;
 import dev.isxander.yacl.gui.controllers.EnumController;
 import dev.isxander.yacl.gui.controllers.TickBoxController;
 import dev.isxander.yacl.gui.controllers.slider.IntegerSliderController;
@@ -70,12 +68,26 @@ public class XandersSodiumOptions {
         return builder.build().generateScreen(prevScreen);
     }
 
-    private static <T> Option<T> convertOption(me.jellysquid.mods.sodium.client.gui.options.Option<T> sodiumOption) {
+    private static <T> Option<?> convertOption(me.jellysquid.mods.sodium.client.gui.options.Option<T> sodiumOption) {
+        if (Compat.ENTITY_VIEW_DIST && EntityViewDistanceCompat.isFakeOption(sodiumOption)) {
+            return EntityViewDistanceCompat.convertFakeOption(sodiumOption);
+        }
+
+        if (!(sodiumOption instanceof ClassCapture<?>)) {
+            // incompatible - some custom option impl
+            return ButtonOption.createBuilder()
+                    .name(sodiumOption.getName())
+                    .tooltip(sodiumOption.getTooltip(), Text.translatable("xso.incompatible.tooltip").formatted(Formatting.RED))
+                    .available(false)
+                    .controller(opt -> new ActionController(opt, Text.translatable("xso.incompatible.button").formatted(Formatting.RED)))
+                    .action((screen, opt) -> {})
+                    .build();
+        }
+
         Option.Builder<T> builder = Option.createBuilder(((ClassCapture<T>) sodiumOption).getCapturedClass())
                 .name(sodiumOption.getName())
                 .tooltip(sodiumOption.getTooltip())
                 .flags(convertFlags(sodiumOption))
-                .available(sodiumOption.isAvailable())
                 .binding(Compat.MORE_CULLING ? MoreCullingCompat.getBinding(sodiumOption) : new SodiumBinding<>(sodiumOption))
                 .available(sodiumOption.isAvailable());
 
