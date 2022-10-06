@@ -34,6 +34,7 @@ This mod works with the following Sodium GUI add-ons:
 - [Sodium Extra](https://modrinth.com/mod/sodium-extra)
 - [More Culling](https://modrinth.com/mod/moreculling)
 - [Cull Less Leaves](https://modrinth.com/mod/cull-less-leaves)
+- [EntityViewDistance](https://modrinth.com/mod/entity-view-distance)
 
 Most others will _probably work_, if not [make sure to report them!](https://github.com/isXander/xanders-sodium-options/issues)
 
