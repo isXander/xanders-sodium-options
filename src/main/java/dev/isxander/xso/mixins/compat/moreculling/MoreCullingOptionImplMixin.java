@@ -1,6 +1,6 @@
 package dev.isxander.xso.mixins.compat.moreculling;
 
-import ca.fxco.moreculling.config.sodium.MoreCullingOptionImpl;
+import ca.fxco.moreculling.config.sodium.MoreCullingSodiumOptionImpl;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import dev.isxander.xso.compat.MoreCullingCompat;
 import dev.isxander.xso.utils.ClassCapture;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Pseudo
-@Mixin(value = MoreCullingOptionImpl.class, remap = false)
+@Mixin(value = MoreCullingSodiumOptionImpl.class, remap = false)
 public abstract class MoreCullingOptionImplMixin<S, T> implements ClassCapture<T>, MoreCullingCompat.OptionHolder<T> {
     @Unique
     private Class<T> xso$capturedClass = null;
@@ -23,7 +23,7 @@ public abstract class MoreCullingOptionImplMixin<S, T> implements ClassCapture<T
     private Option<T> xso$heldOption = null;
 
     @ModifyReturnValue(method = "createBuilder", at = @At("RETURN"))
-    private static <S, T> MoreCullingOptionImpl.Builder<S, T> passClassToBuilder(MoreCullingOptionImpl.Builder<S, T> builder, Class<T> type, OptionStorage<S> storage) {
+    private static <S, T> MoreCullingSodiumOptionImpl.Builder<S, T> passClassToBuilder(MoreCullingSodiumOptionImpl.Builder<S, T> builder, Class<T> type, OptionStorage<S> storage) {
         ((ClassCapture<T>) builder).setCapturedClass(type);
         return builder;
     }

@@ -6,17 +6,19 @@ import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;
 import me.jellysquid.mods.sodium.client.gui.options.OptionPage;
 import net.coderbot.iris.gui.screen.ShaderPackScreen;
 
+import java.util.Optional;
+
 public class IrisCompat {
-    public static ConfigCategory replaceShaderPackPage(SodiumOptionsGUI optionsGUI, OptionPage page) {
+    public static Optional<ConfigCategory> replaceShaderPackPage(SodiumOptionsGUI optionsGUI, OptionPage page) {
         ShaderPageHolder shaderPageHolder = (ShaderPageHolder) optionsGUI;
         if (shaderPageHolder.getShaderPage() == page) {
-            return PlaceholderCategory.createBuilder()
+            return Optional.of(PlaceholderCategory.createBuilder()
                     .name(page.getName())
                     .screen((client, parent) -> new ShaderPackScreen(parent))
-                    .build();
+                    .build());
         }
 
-        return null;
+        return Optional.empty();
     }
 
     public interface ShaderPageHolder {

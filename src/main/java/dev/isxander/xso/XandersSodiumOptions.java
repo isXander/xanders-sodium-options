@@ -1,13 +1,14 @@
 package dev.isxander.xso;
 
 import dev.isxander.xso.compat.*;
+import dev.isxander.xso.config.XsoConfig;
 import dev.isxander.xso.mixins.CyclingControlAccessor;
 import dev.isxander.xso.mixins.SliderControlAccessor;
 import dev.isxander.xso.utils.ClassCapture;
 import dev.isxander.yacl.api.*;
 import dev.isxander.yacl.gui.controllers.ActionController;
-import dev.isxander.yacl.gui.controllers.EnumController;
 import dev.isxander.yacl.gui.controllers.TickBoxController;
+import dev.isxander.yacl.gui.controllers.cycling.EnumController;
 import dev.isxander.yacl.gui.controllers.slider.IntegerSliderController;
 import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;
 import me.jellysquid.mods.sodium.client.gui.options.OptionPage;
@@ -16,37 +17,72 @@ import me.jellysquid.mods.sodium.client.gui.options.control.CyclingControl;
 import me.jellysquid.mods.sodium.client.gui.options.control.SliderControl;
 import me.jellysquid.mods.sodium.client.gui.options.control.TickBoxControl;
 import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.TranslatableOption;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class XandersSodiumOptions {
-    public static Screen wrapSodiumScreen(SodiumOptionsGUI sodiumOptionsGUI, List<OptionPage> pages, Screen prevScreen) {
-        YetAnotherConfigLib.Builder builder = YetAnotherConfigLib.createBuilder()
-                .title(Text.translatable("Sodium Options"));
+    private static boolean errorOccured = false;
 
-        for (OptionPage page : pages) {
+    public static Screen wrapSodiumScreen(SodiumOptionsGUI sodiumOptionsGUI, List<OptionPage> pages, Screen prevScreen) {
+        try {
+            YetAnotherConfigLib.Builder builder = YetAnotherConfigLib.createBuilder()
+                    .title(Text.translatable("Sodium Options"));
+
+            for (OptionPage page : pages) {
+                builder.category(convertCategory(page, sodiumOptionsGUI));
+            }
+
+            builder.category(XsoConfig.getConfigCategory());
+
+            builder.save(() -> {
+                Set<OptionStorage<?>> storages = new HashSet<>();
+                pages.stream().flatMap(s -> s.getOptions().stream()).forEach(opt -> storages.add(opt.getStorage()));
+                storages.forEach(OptionStorage::save);
+
+                XsoConfig.INSTANCE.save();
+            });
+
+            return builder.build().generateScreen(prevScreen);
+        } catch (Exception e) {
+            var exception = new IllegalStateException("Failed to convert Sodium option screen to YACL with XSO!", e);
+
+            if (XsoConfig.INSTANCE.getConfig().hardCrash) {
+                throw exception;
+            } else {
+                exception.printStackTrace();
+
+                return new NoticeScreen(() -> {
+                    errorOccured = true;
+                    MinecraftClient.getInstance().setScreen(sodiumOptionsGUI);
+                    errorOccured = false;
+                }, Text.literal("Xander's Sodium Options failed"), Text.literal("Whilst trying to convert Sodium's GUI to YACL with XSO mod, an error occured which prevented the conversion. This is most likely due to a third-party mod adding its own settings to Sodium's screen. XSO will now display the original GUI.\n\nThe error has been logged to latest.log file."), ScreenTexts.PROCEED, true);
+            }
+        }
+    }
+
+    private static ConfigCategory convertCategory(OptionPage page, SodiumOptionsGUI sodiumOptionsGUI) {
+        try {
             if (Compat.IRIS) {
-                ConfigCategory shaderPackPage = IrisCompat.replaceShaderPackPage(sodiumOptionsGUI, page);
-                if (shaderPackPage != null) {
-                    builder.category(shaderPackPage);
-                    continue;
+                Optional<ConfigCategory> shaderPackPage = IrisCompat.replaceShaderPackPage(sodiumOptionsGUI, page);
+                if (shaderPackPage.isPresent()) {
+                    return shaderPackPage.get();
                 }
             }
 
             ConfigCategory.Builder categoryBuilder = ConfigCategory.createBuilder()
                     .name(page.getName());
 
-            for (me.jellysquid.mods.sodium.client.gui.options.OptionGroup group : page.getGroups()) {
+            for (var group : page.getGroups()) {
                 OptionGroup.Builder groupBuilder = OptionGroup.createBuilder();
 
-                for (me.jellysquid.mods.sodium.client.gui.options.Option<?> option : group.getOptions()) {
+                for (var option : group.getOptions()) {
                     groupBuilder.option(convertOption(option));
                 }
 
@@ -56,50 +92,52 @@ public class XandersSodiumOptions {
             if (Compat.MORE_CULLING)
                 MoreCullingCompat.extendMoreCullingPage(sodiumOptionsGUI, page, categoryBuilder);
 
-            builder.category(categoryBuilder.build());
+            return categoryBuilder.build();
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to convert Sodium option page named '" + page.getName().getString() + "' to YACL config category.", e);
         }
-
-        builder.save(() -> {
-            Set<OptionStorage<?>> storages = new HashSet<>();
-            pages.stream().flatMap(s -> s.getOptions().stream()).forEach(opt -> storages.add(opt.getStorage()));
-            storages.forEach(OptionStorage::save);
-        });
-
-        return builder.build().generateScreen(prevScreen);
     }
 
     private static <T> Option<?> convertOption(me.jellysquid.mods.sodium.client.gui.options.Option<T> sodiumOption) {
-        if (Compat.ENTITY_VIEW_DIST && EntityViewDistanceCompat.isFakeOption(sodiumOption)) {
-            return EntityViewDistanceCompat.convertFakeOption(sodiumOption);
-        }
+        try {
+            if (Compat.ENTITY_VIEW_DIST) {
+                Optional<Option<?>> fakeOption = EntityViewDistanceCompat.convertFakeOption(sodiumOption);
+                if (fakeOption.isPresent()) return fakeOption.get();
+            }
 
-        if (!(sodiumOption instanceof ClassCapture<?>)) {
-            // incompatible - some custom option impl
-            return ButtonOption.createBuilder()
+            if (!(sodiumOption instanceof ClassCapture<?>)) {
+                throw new IllegalStateException("Failed to capture class of sodium option! Likely due to custom Option implementation.");
+            }
+
+            Option.Builder<T> builder = Option.createBuilder(((ClassCapture<T>) sodiumOption).getCapturedClass())
                     .name(sodiumOption.getName())
-                    .tooltip(sodiumOption.getTooltip(), Text.translatable("xso.incompatible.tooltip").formatted(Formatting.RED))
-                    .available(false)
-                    .controller(opt -> new ActionController(opt, Text.translatable("xso.incompatible.button").formatted(Formatting.RED)))
-                    .action((screen, opt) -> {})
-                    .build();
+                    .tooltip(sodiumOption.getTooltip())
+                    .flags(convertFlags(sodiumOption))
+                    .binding(Compat.MORE_CULLING ? MoreCullingCompat.getBinding(sodiumOption) : new SodiumBinding<>(sodiumOption))
+                    .available(sodiumOption.isAvailable());
+
+            if (sodiumOption.getImpact() != null) {
+                builder.tooltip(Text.translatable("sodium.options.performance_impact_string", sodiumOption.getImpact().getLocalizedName()).formatted(Formatting.GRAY));
+            }
+
+            addController(builder, sodiumOption);
+
+            Option<T> built = builder.build();
+            if (Compat.MORE_CULLING) MoreCullingCompat.addAvailableCheck(built, sodiumOption);
+            return built;
+        } catch (Exception e) {
+            if (XsoConfig.INSTANCE.getConfig().lenientOptions) {
+                return ButtonOption.createBuilder()
+                        .name(sodiumOption.getName())
+                        .tooltip(sodiumOption.getTooltip(), Text.translatable("xso.incompatible.tooltip").formatted(Formatting.RED))
+                        .available(false)
+                        .controller(opt -> new ActionController(opt, Text.translatable("xso.incompatible.button").formatted(Formatting.RED)))
+                        .action((screen, opt) -> {})
+                        .build();
+            } else {
+                throw new IllegalStateException("Failed to convert Sodium option named '" + sodiumOption.getName().getString() + "' to a YACL option!", e);
+            }
         }
-
-        Option.Builder<T> builder = Option.createBuilder(((ClassCapture<T>) sodiumOption).getCapturedClass())
-                .name(sodiumOption.getName())
-                .tooltip(sodiumOption.getTooltip())
-                .flags(convertFlags(sodiumOption))
-                .binding(Compat.MORE_CULLING ? MoreCullingCompat.getBinding(sodiumOption) : new SodiumBinding<>(sodiumOption))
-                .available(sodiumOption.isAvailable());
-
-        if (sodiumOption.getImpact() != null) {
-            builder.tooltip(Text.translatable("sodium.options.performance_impact_string", sodiumOption.getImpact().getLocalizedName()).formatted(Formatting.GRAY));
-        }
-
-        addController(builder, sodiumOption);
-
-        Option<T> built = builder.build();
-        if (Compat.MORE_CULLING) MoreCullingCompat.addAvailableCheck(built, sodiumOption);
-        return built;
     }
 
     // nasty, nasty raw types to make the compiler not commit die
@@ -155,5 +193,9 @@ public class XandersSodiumOptions {
         }
 
         return flags;
+    }
+
+    public static boolean shouldConvertGui() {
+        return XsoConfig.INSTANCE.getConfig().enabled && !errorOccured;
     }
 }

@@ -2,9 +2,9 @@ plugins {
     java
 
     id("fabric-loom") version "1.0.+"
-    id("io.github.juuxel.loom-quiltflower") version "1.7.+"
+    id("io.github.juuxel.loom-quiltflower") version "1.8.+"
 
-    id("com.modrinth.minotaur") version "2.4.+"
+    id("com.modrinth.minotaur") version "2.5.+"
     id("me.hypherionmc.cursegradle") version "2.+"
     id("com.github.breadmoirai.github-release") version "2.+"
     id("io.github.p03w.machete") version "1.+"
@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "dev.isxander"
-version = "1.0.2"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -23,6 +23,7 @@ repositories {
     maven("https://maven.shedaniel.me")
     maven("https://maven.terraformersmc.com")
     maven("https://jitpack.io")
+    maven("https://maven.gegy.dev")
     maven("https://api.modrinth.com/maven") {
         content {
             includeGroup("maven.modrinth")
@@ -38,23 +39,23 @@ dependencies {
     mappings("net.fabricmc:yarn:$minecraftVersion+build.+:v2")
     modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
 
-    modImplementation("dev.isxander:yet-another-config-lib:1.5.0")
-    modImplementation("maven.modrinth:sodium:mc1.19.2-0.4.4")
+    modImplementation("dev.isxander:yet-another-config-lib:2.2.0")
+    modImplementation("maven.modrinth:sodium:mc1.19.3-0.4.6")
+    modImplementation("com.terraformersmc:modmenu:5.0.2")
 
     // sodium extra better options compat
-    modImplementation("me.flashyreese.mods:sodium-extra-fabric:0.4.10+mc1.19.2-build.64") {
-        exclude(module = "reeses-sodium-options")
-    }
+    modImplementation("maven.modrinth:sodium-extra:mc1.19.3-0.4.15")
     // moreculling category placement
-    modImplementation("maven.modrinth:moreculling:v0.10.0")
+    modImplementation("maven.modrinth:moreculling:v0.12.3")
     // iris category placement
-    modImplementation("maven.modrinth:iris:1.19.x-v1.3.1")
+    modImplementation("maven.modrinth:iris:1.19.3-v1.4.6")
     // entityviewdistance button option compat
-    modImplementation("maven.modrinth:entity-view-distance:1.0.2+1.19")
+    modImplementation("maven.modrinth:entity-view-distance:1.1.0+1.19.3")
 
-    modRuntimeOnly("me.shedaniel.cloth:cloth-config-fabric:8.2.88")
+    modRuntimeOnly("me.shedaniel.cloth:cloth-config-fabric:9.0.+")
+    modRuntimeOnly("dev.lambdaurora:spruceui:4.1.0+1.19.3")
 
-    modImplementation(include("com.github.llamalad7:mixinextras:0.0.12")!!)
+    implementation(include(annotationProcessor("com.github.llamalad7:mixinextras:0.1.1")!!)!!)
 }
 
 tasks {

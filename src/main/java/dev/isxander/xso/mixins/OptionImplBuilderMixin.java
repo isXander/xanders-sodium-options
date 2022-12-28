@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(OptionImpl.Builder.class)
+@Mixin(value = OptionImpl.Builder.class, remap = false)
 public class OptionImplBuilderMixin<S, T> implements ClassCapture<T> {
     @Unique
     private Class<T> xso$capturedClass = null;

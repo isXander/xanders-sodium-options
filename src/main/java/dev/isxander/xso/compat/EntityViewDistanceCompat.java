@@ -5,18 +5,19 @@ import dev.isxander.yacl.gui.controllers.ActionController;
 import eu.pb4.entityviewdistance.modcompat.SodiumCompat;
 import me.jellysquid.mods.sodium.client.gui.options.Option;
 
-public class EntityViewDistanceCompat {
-    public static boolean isFakeOption(Option<?> sodiumOption) {
-        return sodiumOption instanceof SodiumCompat.FakeOptionImpl;
-    }
+import java.util.Optional;
 
-    public static ButtonOption convertFakeOption(Option<?> sodiumOption) {
-        SodiumCompat.FakeOptionImpl fakeOption = (SodiumCompat.FakeOptionImpl) sodiumOption;
-        return ButtonOption.createBuilder()
-                .name(sodiumOption.getName())
-                .tooltip(sodiumOption.getTooltip())
-                .controller(ActionController::new)
-                .action(((yaclScreen, buttonOption) -> fakeOption.setValue(SodiumCompat.Void.VOID)))
-                .build();
+public class EntityViewDistanceCompat {
+    public static Optional<dev.isxander.yacl.api.Option<?>> convertFakeOption(Option<?> sodiumOption) {
+        if (sodiumOption instanceof SodiumCompat.FakeOptionImpl fakeOption) {
+            return Optional.of(ButtonOption.createBuilder()
+                    .name(sodiumOption.getName())
+                    .tooltip(sodiumOption.getTooltip())
+                    .controller(ActionController::new)
+                    .action(((yaclScreen, buttonOption) -> fakeOption.setValue(SodiumCompat.Void.VOID)))
+                    .build());
+        }
+
+        return Optional.empty();
     }
 }

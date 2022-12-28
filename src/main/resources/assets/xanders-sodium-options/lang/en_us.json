@@ -1,4 +1,12 @@
 {
-  "xso.incompatible.button": "Incompatible",
+  "xso.title": "Xander's Sodium Options",
+  "xso.cfg.enabled": "XSO",
+  "xso.cfg.enabled.tooltip": "Configures whether XSO should override Sodium's options. When disabled, you can configure this mod through mod menu.",
+  "xso.cfg.lenient_opts": "Lenient Options",
+  "xso.cfg.lenient_opts.tooltip": "If XSO fails to convert an option, instead of failing to create the whole GUI, it adds a placeholder option in place of the broken option so you can continue to use XSO with an incompatible mod.",
+  "xso.cfg.hard_crash": "Hard Crash",
+  "xso.cfg.hard_crash.tooltip": "If XSO cannot convert the Sodium GUI for whatever reason, enabling this makes Minecraft crash completely, rather than displaying the warning and giving you the original Sodium GUI. This can be beneficial as it makes Minecraft generate a crash report whereas it only prints to latest.log with this option off.",
+
+  "xso.incompatible.button": "Option Incompatible",
   "xso.incompatible.tooltip": "This option is currently incompatible with XSO. Please make an issue to get support!"
 }

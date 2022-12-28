@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Pseudo
-@Mixin(SodiumExtraGameOptions.class)
+@Mixin(value = SodiumExtraGameOptions.class, remap = false)
 public class SodiumExtraGameOptionsMixins {
     @ModifyReturnValue(method = "hasSuggestedRSO", at = @At("RETURN"))
     private boolean dontShowRSOScreen(boolean hasSuggested) {

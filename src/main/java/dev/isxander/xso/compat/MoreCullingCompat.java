@@ -2,12 +2,12 @@ package dev.isxander.xso.compat;
 
 import ca.fxco.moreculling.config.sodium.FloatSliderControl;
 import ca.fxco.moreculling.config.sodium.IntSliderControl;
-import ca.fxco.moreculling.config.sodium.MoreCullingOptionImpl;
+import ca.fxco.moreculling.config.sodium.MoreCullingSodiumOptionImpl;
 import ca.fxco.moreculling.utils.CacheUtils;
 import dev.isxander.xso.SodiumBinding;
 import dev.isxander.xso.mixins.compat.moreculling.FloatSliderControlAccessor;
 import dev.isxander.xso.mixins.compat.moreculling.IntSliderControlAccessor;
-import dev.isxander.xso.mixins.compat.moreculling.MoreCullingOptionImplAccessor;
+import dev.isxander.xso.mixins.compat.moreculling.MoreCullingSodiumOptionImplAccessor;
 import dev.isxander.yacl.api.ButtonOption;
 import dev.isxander.yacl.api.ConfigCategory;
 import dev.isxander.yacl.gui.controllers.ActionController;
@@ -21,8 +21,8 @@ import net.minecraft.text.Text;
 
 public class MoreCullingCompat {
     public static <S, T> SodiumBinding<S, T> getBinding(Option<T> option) {
-        if (option instanceof MoreCullingOptionImpl<?, ?> moreCullingOption) {
-            return new SodiumBinding<>(((MoreCullingOptionImplAccessor<S, T>) moreCullingOption).getBinding(), (OptionStorage<S>) moreCullingOption.getStorage());
+        if (option instanceof MoreCullingSodiumOptionImpl<?, ?> moreCullingOption) {
+            return new SodiumBinding<>(((MoreCullingSodiumOptionImplAccessor<S, T>) moreCullingOption).getBinding(), (OptionStorage<S>) moreCullingOption.getStorage());
         } else {
             return new SodiumBinding<>(option);
         }
@@ -30,7 +30,7 @@ public class MoreCullingCompat {
 
     @SuppressWarnings({"unchecked"})
     public static <T> void addAvailableCheck(dev.isxander.yacl.api.Option<T> yaclOption, Option<T> sodiumOption) {
-        if (!(sodiumOption instanceof MoreCullingOptionImpl<?, ?>))
+        if (!(sodiumOption instanceof MoreCullingSodiumOptionImpl<?,?>))
             return;
 
         ((OptionHolder<T>) sodiumOption).holdOption(yaclOption);
