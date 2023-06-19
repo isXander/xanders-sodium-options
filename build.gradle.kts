@@ -48,7 +48,7 @@ dependencies {
     // moreculling category placement
     modImplementation("maven.modrinth:moreculling:v0.12.3")
     // iris category placement
-    modImplementation("maven.modrinth:iris:1.19.3-v1.4.6")
+    modImplementation("maven.modrinth:iris:1.4.6+1.19.3")
     // entityviewdistance button option compat
     modImplementation("maven.modrinth:entity-view-distance:1.1.0+1.19.3")
 
