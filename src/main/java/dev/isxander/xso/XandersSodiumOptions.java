@@ -5,11 +5,11 @@ import dev.isxander.xso.config.XsoConfig;
 import dev.isxander.xso.mixins.CyclingControlAccessor;
 import dev.isxander.xso.mixins.SliderControlAccessor;
 import dev.isxander.xso.utils.ClassCapture;
-import dev.isxander.yacl.api.*;
-import dev.isxander.yacl.gui.controllers.ActionController;
-import dev.isxander.yacl.gui.controllers.TickBoxController;
-import dev.isxander.yacl.gui.controllers.cycling.EnumController;
-import dev.isxander.yacl.gui.controllers.slider.IntegerSliderController;
+import dev.isxander.yacl3.api.*;
+import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
+import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
+import dev.isxander.yacl3.api.controller.TickBoxControllerBuilder;
+import dev.isxander.yacl3.impl.controller.EnumControllerBuilderImpl;
 import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;
 import me.jellysquid.mods.sodium.client.gui.options.OptionPage;
 import me.jellysquid.mods.sodium.client.gui.options.TextProvider;
@@ -21,6 +21,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.screen.ScreenTexts;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.TranslatableOption;
@@ -80,13 +81,11 @@ public class XandersSodiumOptions {
                     .name(page.getName());
 
             for (var group : page.getGroups()) {
-                OptionGroup.Builder groupBuilder = OptionGroup.createBuilder();
+                categoryBuilder.option(LabelOption.create(Text.empty()));
 
                 for (var option : group.getOptions()) {
-                    groupBuilder.option(convertOption(option));
+                    categoryBuilder.option(convertOption(option));
                 }
-
-                categoryBuilder.group(groupBuilder.build());
             }
 
             if (Compat.MORE_CULLING)
@@ -100,6 +99,11 @@ public class XandersSodiumOptions {
 
     private static <T> Option<?> convertOption(me.jellysquid.mods.sodium.client.gui.options.Option<T> sodiumOption) {
         try {
+            if (sodiumOption.getName().contains(Text.of("Fullscreen Resolution"))) {
+                // Halt debugger so i can step by step
+                System.out.println("debug");
+            }
+
             if (Compat.ENTITY_VIEW_DIST) {
                 Optional<Option<?>> fakeOption = EntityViewDistanceCompat.convertFakeOption(sodiumOption);
                 if (fakeOption.isPresent()) return fakeOption.get();
@@ -109,16 +113,19 @@ public class XandersSodiumOptions {
                 throw new IllegalStateException("Failed to capture class of sodium option! Likely due to custom Option implementation.");
             }
 
+            MutableText descText = sodiumOption.getTooltip().copy();
+
             Option.Builder<T> builder = Option.createBuilder(((ClassCapture<T>) sodiumOption).getCapturedClass())
                     .name(sodiumOption.getName())
-                    .tooltip(sodiumOption.getTooltip())
                     .flags(convertFlags(sodiumOption))
                     .binding(Compat.MORE_CULLING ? MoreCullingCompat.getBinding(sodiumOption) : new SodiumBinding<>(sodiumOption))
                     .available(sodiumOption.isAvailable());
 
             if (sodiumOption.getImpact() != null) {
-                builder.tooltip(Text.translatable("sodium.options.performance_impact_string", sodiumOption.getImpact().getLocalizedName()).formatted(Formatting.GRAY));
+                descText = descText.append("\n").append(Text.translatable("sodium.options.performance_impact_string", sodiumOption.getImpact().getLocalizedName()).formatted(Formatting.GRAY));
             }
+
+            builder.description(OptionDescription.of(descText));
 
             addController(builder, sodiumOption);
 
@@ -127,11 +134,13 @@ public class XandersSodiumOptions {
             return built;
         } catch (Exception e) {
             if (XsoConfig.INSTANCE.getConfig().lenientOptions) {
+                System.out.println("Failed: " + sodiumOption.getName().getString());
+                e.printStackTrace();
                 return ButtonOption.createBuilder()
                         .name(sodiumOption.getName())
-                        .tooltip(sodiumOption.getTooltip(), Text.translatable("xso.incompatible.tooltip").formatted(Formatting.RED))
+                        .description(OptionDescription.of(sodiumOption.getTooltip(), Text.translatable("xso.incompatible.tooltip").formatted(Formatting.RED)))
                         .available(false)
-                        .controller(opt -> new ActionController(opt, Text.translatable("xso.incompatible.button").formatted(Formatting.RED)))
+                        .text(Text.translatable("xso.incompatible.button").formatted(Formatting.RED))
                         .action((screen, opt) -> {})
                         .build();
             } else {
@@ -144,24 +153,28 @@ public class XandersSodiumOptions {
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static <T> void addController(Option.Builder yaclOption, me.jellysquid.mods.sodium.client.gui.options.Option<T> sodiumOption) {
         if (sodiumOption.getControl() instanceof TickBoxControl) {
-            yaclOption.controller(opt -> new TickBoxController((Option<Boolean>) opt));
+            yaclOption.controller(opt -> TickBoxControllerBuilder.create((Option<Boolean>) opt));
             return;
         }
 
         if (sodiumOption.getControl() instanceof CyclingControl cyclingControl) {
-            yaclOption.controller(opt -> new EnumController((Option) opt, value -> {
-                if (value instanceof TextProvider textProvider)
-                    return textProvider.getLocalizedName();
-                if (value instanceof TranslatableOption translatableOption)
-                    return translatableOption.getText();
-                return Text.of(((Enum<?>) value).name());
-            }, ((CyclingControlAccessor<?>) cyclingControl).getAllowedValues()));
+            var allowedValues = ((CyclingControlAccessor<?>) cyclingControl).getAllowedValues();
+
+            Class<?> arrType = allowedValues.getClass().getComponentType();
+
+            yaclOption.controller(opt -> new EnumControllerBuilderImpl<>((Option) opt).formatValue(value -> {
+                    if (value instanceof TextProvider textProvider)
+                        return textProvider.getLocalizedName();
+                    if (value instanceof TranslatableOption translatableOption)
+                        return translatableOption.getText();
+                    return Text.of(((Enum<?>) value).name());
+            }).enumClass(arrType));
             return;
         }
 
         if (sodiumOption.getControl() instanceof SliderControl sliderControl) {
             SliderControlAccessor accessor = (SliderControlAccessor) sliderControl;
-            yaclOption.controller(opt -> new IntegerSliderController((Option<Integer>) opt, accessor.getMin(), accessor.getMax(), accessor.getInterval(), value -> Text.of(accessor.getMode().format(value))));
+            yaclOption.controller(opt -> IntegerSliderControllerBuilder.create((Option<Integer>) opt).step(accessor.getInterval()).range(accessor.getMin(), accessor.getMax()).formatValue(value -> accessor.getMode().format(value)));
             return;
         }
 

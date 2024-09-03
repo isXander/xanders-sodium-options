@@ -2,7 +2,7 @@ package dev.isxander.xso.config;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
-import dev.isxander.yacl.api.YetAnotherConfigLib;
+import dev.isxander.yacl3.api.YetAnotherConfigLib;
 import net.minecraft.text.Text;
 
 public class ModMenuEntrypoint implements ModMenuApi {

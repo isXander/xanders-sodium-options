@@ -1,50 +1,77 @@
-name: Gradle CI
-
+name: Distribute JARs
 on:
-  push:
-    branches:
-      - '*'
-    paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
-      - '.gitignore'
-      - '.editorconfig'
-      - 'changelogs/**'
-  pull_request:
-    branches:
-      - '*'
-    paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
-      - '.gitignore'
-      - '.editorconfig'
-      - 'changelogs/**'
-  workflow_dispatch:
+  release:
+    types: [published]
+
 jobs:
   build:
-    runs-on: ubuntu-latest
-    name: Build with gradle
-
+    runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          java-version: 17
-          distribution: temurin
-      - uses: actions/cache@v3
+          distribution: corretto
+          java-version: 21
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
-            ~/.gradle/wrapper
-            ./.gradle/loom-cache
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+            ~/.gradle/wrapper/
+          key: ${{ runner.os }}-gradle
           restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Build with Gradle
-        run: ./gradlew build --no-daemon
-      - uses: actions/upload-artifact@v3
+            ${{ runner.os }}-gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          path: build/libs/*.jar
+          gradle-version: "wrapper"
+
+      - name: Build JARs
+        uses: Wandalen/wretry.action@master
+        with:
+          command: "gradle chiseledBuild"
+          attempt_limit: 3
+
+      - name: Upload Built JARs
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-jars
+          path: |
+            ./versions/**/build/libs/*.jar
+
+  distribute:
+    needs: build
+    runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        # REMINDER: Update this array when adding new game versions.
+        game_version: [
+          "1.20.1"
+        ]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Built JARs
+        uses: actions/download-artifact@v4
+        with:
+          name: built-jars
+          path: ./versions
+
+      - name: Publish to Modrinth, CurseForge, etc.
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          files: |
+            versions/${{ matrix.game_version }}/build/libs/!(*-@(dev|sources|javadoc)).jar
+            versions/${{ matrix.game_version }}/build/libs/*-@(dev|sources|javadoc).jar
+          version: ${{ github.ref_name }}+${{ matrix.game_version }}
+          modrinth-id: ${{ vars.MODRINTH_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          curseforge-id: ${{ vars.CURSEFORGE_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          github-token: ${{ secrets.CLASSIC_GITHUB_TOKEN }}

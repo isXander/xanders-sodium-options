@@ -1,7 +1,7 @@
 package dev.isxander.xso;
 
 import dev.isxander.xso.mixins.OptionImplAccessor;
-import dev.isxander.yacl.api.Binding;
+import dev.isxander.yacl3.api.Binding;
 import me.jellysquid.mods.sodium.client.gui.options.Option;
 import me.jellysquid.mods.sodium.client.gui.options.OptionImpl;
 import me.jellysquid.mods.sodium.client.gui.options.binding.OptionBinding;

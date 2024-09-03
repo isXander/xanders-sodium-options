@@ -4,7 +4,7 @@ import ca.fxco.moreculling.config.sodium.MoreCullingSodiumOptionImpl;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import dev.isxander.xso.compat.MoreCullingCompat;
 import dev.isxander.xso.utils.ClassCapture;
-import dev.isxander.yacl.api.Option;
+import dev.isxander.yacl3.api.Option;
 import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;

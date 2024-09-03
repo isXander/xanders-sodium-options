@@ -8,11 +8,12 @@ import dev.isxander.xso.SodiumBinding;
 import dev.isxander.xso.mixins.compat.moreculling.FloatSliderControlAccessor;
 import dev.isxander.xso.mixins.compat.moreculling.IntSliderControlAccessor;
 import dev.isxander.xso.mixins.compat.moreculling.MoreCullingSodiumOptionImplAccessor;
-import dev.isxander.yacl.api.ButtonOption;
-import dev.isxander.yacl.api.ConfigCategory;
-import dev.isxander.yacl.gui.controllers.ActionController;
-import dev.isxander.yacl.gui.controllers.slider.FloatSliderController;
-import dev.isxander.yacl.gui.controllers.slider.IntegerSliderController;
+import dev.isxander.yacl3.api.ConfigCategory;
+import dev.isxander.yacl3.api.controller.FloatSliderControllerBuilder;
+import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
+import dev.isxander.yacl3.gui.controllers.ActionController;
+import dev.isxander.yacl3.gui.controllers.slider.FloatSliderController;
+import dev.isxander.yacl3.gui.controllers.slider.IntegerSliderController;
 import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;
 import me.jellysquid.mods.sodium.client.gui.options.Option;
 import me.jellysquid.mods.sodium.client.gui.options.OptionPage;
@@ -29,7 +30,7 @@ public class MoreCullingCompat {
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T> void addAvailableCheck(dev.isxander.yacl.api.Option<T> yaclOption, Option<T> sodiumOption) {
+    public static <T> void addAvailableCheck(dev.isxander.yacl3.api.Option<T> yaclOption, Option<T> sodiumOption) {
         if (!(sodiumOption instanceof MoreCullingSodiumOptionImpl<?,?>))
             return;
 
@@ -37,16 +38,16 @@ public class MoreCullingCompat {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static <T> boolean convertControl(dev.isxander.yacl.api.Option.Builder yaclOption, Option<T> sodiumOption) {
+    public static <T> boolean convertControl(dev.isxander.yacl3.api.Option.Builder<T> yaclOption, Option<T> sodiumOption) {
         if (sodiumOption.getControl() instanceof IntSliderControl sliderControl) {
             IntSliderControlAccessor accessor = (IntSliderControlAccessor) sliderControl;
-            yaclOption.controller(opt -> new IntegerSliderController((dev.isxander.yacl.api.Option<Integer>) opt, accessor.getMin(), accessor.getMax(), accessor.getInterval()));
+            yaclOption.controller(opt -> (dev.isxander.yacl3.api.controller.ControllerBuilder<T>) IntegerSliderControllerBuilder.create((dev.isxander.yacl3.api.Option<Integer>) opt).range(accessor.getMin(), accessor.getMax()).step(accessor.getInterval()));
             return true;
         }
 
         if (sodiumOption.getControl() instanceof FloatSliderControl sliderControl) {
             FloatSliderControlAccessor accessor = (FloatSliderControlAccessor) sliderControl;
-            yaclOption.controller(opt -> new FloatSliderController((dev.isxander.yacl.api.Option<Float>) opt, accessor.getMin(), accessor.getMax(), accessor.getInterval()));
+            yaclOption.controller(opt -> (dev.isxander.yacl3.api.controller.ControllerBuilder<T>) FloatSliderControllerBuilder.create((dev.isxander.yacl3.api.Option<Float>) opt).range(accessor.getMin(), accessor.getMax()).step(accessor.getInterval()));
             return true;
         }
 
@@ -56,16 +57,15 @@ public class MoreCullingCompat {
     public static void extendMoreCullingPage(SodiumOptionsGUI optionsGUI, OptionPage page, ConfigCategory.Builder builder) {
         MoreCullingPageHolder shaderPageHolder = (MoreCullingPageHolder) optionsGUI;
         if (shaderPageHolder.getMoreCullingPage() == page) {
-            builder.option(ButtonOption.createBuilder()
+            builder.option(dev.isxander.yacl3.api.ButtonOption.createBuilder()
                     .name(Text.translatable("moreculling.config.resetCache"))
                     .action((screen, button) -> CacheUtils.resetAllCache())
-                    .controller(ActionController::new)
                     .build());
         }
     }
 
     public interface OptionHolder<T> {
-        void holdOption(dev.isxander.yacl.api.Option<T> option);
+        void holdOption(dev.isxander.yacl3.api.Option<T> option);
     }
 
     public interface MoreCullingPageHolder {

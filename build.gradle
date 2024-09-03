@@ -1,0 +1,94 @@
+plugins {
+    id 'fabric-loom' version '1.6-SNAPSHOT'
+}
+
+version =  property("mod.version") + "+" + stonecutter.current.version
+group = "dev.isxander"
+
+base {
+    archivesName = property("mod.name")
+}
+
+repositories {
+    mavenCentral()
+   maven { url = "https://maven.isxander.dev/releases" }
+   maven { url = "https://maven.isxander.dev/snapshots" }
+   maven { url = "https://maven.flashyreese.me/releases" }
+   maven { url = "https://maven.flashyreese.me/snapshots" }
+   maven { url = "https://maven.shedaniel.me" }
+   maven { url = "https://maven.terraformersmc.com" }
+   maven { url = "https://jitpack.io" }
+   maven { url = "https://maven.gegy.dev" }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${stonecutter.current.version}"
+    mappings "net.fabricmc:yarn:${property('deps.yarn')}:v2"
+
+    modImplementation "net.fabricmc:fabric-loader:${property("deps.fabric_loader")}"
+    modRuntimeOnly "net.fabricmc.fabric-api:fabric-api:${property('deps.fabric')}"
+
+    include modImplementation("dev.isxander:yet-another-config-lib:${property('deps.yacl')}") {
+        // Remove any fabric API modules.
+        exclude group: "net.fabricmc.fabric-api", module: "fabric-api"
+    }
+
+    modImplementation("maven.modrinth:sodium:${property('deps.sodium')}")
+    modRuntimeOnly modCompileOnly("com.terraformersmc:modmenu:${property('deps.modmenu')}")
+
+    // sodium extra better options compat
+    modImplementation "maven.modrinth:sodium-extra:${property('deps.sodium-extra')}"
+    // moreculling category placement
+    modCompileOnly "maven.modrinth:moreculling:${property('deps.moreculling')}"
+    // iris category placement
+    modImplementation "maven.modrinth:iris:${property('deps.iris')}"
+    // entityviewdistance button option compat
+    modImplementation "maven.modrinth:entity-view-distance:${property('deps.entity-view-distance')}"
+
+    modRuntimeOnly("maven.modrinth:cloth-config:${property('runtime.cloth')}")
+    modRuntimeOnly("dev.lambdaurora:spruceui:${property('runtime.spruceui')}")
+
+    include modImplementation("net.caffeinemc:CaffeineConfig:1.3.0+1.17")
+    include modImplementation('com.github.Fallen-Breath.conditional-mixin:conditional-mixin-fabric:0.6.2')
+}
+
+processResources {
+    filesMatching("fabric.mod.json") {
+        expand 'mod_version': project.version,
+                'target_minecraft': project.property('mod.target'),
+                'target_fabricloader': project.property('deps.fabric_loader')
+    }
+}
+
+java {
+    var version = stonecutter.eval(stonecutter.current.version, ">1.20.4") ? JavaVersion.VERSION_21 : JavaVersion.VERSION_17
+
+    sourceCompatibility = version
+    targetCompatibility = version
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.base.archivesName.get()}"}
+    }
+}
+
+if (stonecutter.current.active) { // run configs for non-active version would be invalid
+    loom {
+        runConfigs.all {
+            ideConfigGenerated = true // generate IDE tasks for running client, server and testmod, datagen if those are present
+            runDir "../../run" // use a global run directory for all versions
+        }
+    }
+}

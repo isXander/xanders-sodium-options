@@ -1,26 +1,24 @@
 {
   "schemaVersion": 1,
-  "id": "${id}",
-  "version": "${version}",
-  "name": "${name}",
-  "description": "${description}",
+  "id": "xanders-sodium-options",
+  "version": "${mod_version}",
+  "name": "Xander's Sodium Options",
+  "description": "Minecraft-style Sodium options using YACL.",
   "authors": [
-    "isXander"
+    "isXander",
+    "IMB11"
   ],
   "contact": {
-    "homepage": "https://isxander.dev",
-    "issues": "https://github.com/${github}/issues",
-    "sources": "https://github.com/${github}"
+    "homepage": "https://IMB11.dev/",
+    "issues": "https://github.com/isXander/xanders-sodium-options/issues",
+    "sources": "https://github.com/isXander/xanders-sodium-options"
   },
-  "icon": "icon-128x.png",
+  "icon": "icon.png",
   "license": "LGPL-3.0-or-later",
   "environment": "client",
   "entrypoints": {
     "client": [
       "dev.isxander.xso.ModEntrypoint"
-    ],
-    "preLaunch": [
-      "com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
     ],
     "modmenu": [
       "dev.isxander.xso.config.ModMenuEntrypoint"
@@ -30,11 +28,10 @@
     "xanders-sodium-options.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.14.0",
-    "minecraft": "~1.19.3",
-    "java": ">=17",
-    "sodium": "<0.5.0",
-    "yet-another-config-lib": ">=2.1.1"
+    "fabricloader": ">=${target_fabricloader}",
+    "minecraft": "${target_minecraft}",
+    "sodium": "~0.5.0",
+    "yet_another_config_lib_v3": "~3.5.0"
   },
   "breaks": {
     "reeses-sodium-options": "*"

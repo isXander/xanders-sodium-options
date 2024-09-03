@@ -18,7 +18,6 @@
     "compat.moreculling.MoreCullingOptionImplMixin",
     "compat.moreculling.MoreCullingSodiumOptionImplAccessor",
     "compat.moreculling.SodiumOptionsGUIMixin",
-    "compat.sodiumextra.SliderControlExtAccessor",
-    "compat.sodiumextra.SodiumExtraGameOptionsMixins"
+    "compat.sodiumextra.SliderControlExtAccessor"
   ]
 }
