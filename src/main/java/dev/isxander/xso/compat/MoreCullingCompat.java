@@ -11,13 +11,15 @@ import dev.isxander.xso.mixins.compat.moreculling.MoreCullingSodiumOptionImplAcc
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.controller.FloatSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
-import dev.isxander.yacl3.gui.controllers.ActionController;
-import dev.isxander.yacl3.gui.controllers.slider.FloatSliderController;
-import dev.isxander.yacl3.gui.controllers.slider.IntegerSliderController;
-import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;
-import me.jellysquid.mods.sodium.client.gui.options.Option;
-import me.jellysquid.mods.sodium.client.gui.options.OptionPage;
-import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;
+
+//? if <1.21 {
+/*import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;import me.jellysquid.mods.sodium.client.gui.options.Option;import me.jellysquid.mods.sodium.client.gui.options.OptionPage;import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;*///?} else {
+import net.caffeinemc.mods.sodium.client.gui.SodiumOptionsGUI;
+import net.caffeinemc.mods.sodium.client.gui.options.Option;
+import net.caffeinemc.mods.sodium.client.gui.options.OptionPage;
+import net.caffeinemc.mods.sodium.client.gui.options.storage.OptionStorage;
+//?}
+
 import net.minecraft.text.Text;
 
 public class MoreCullingCompat {

@@ -1,11 +1,16 @@
-package dev.isxander.xso.compat;
+//? if <1.21 {
+/*package dev.isxander.xso.compat;
 
 import dev.isxander.yacl3.api.ButtonOption;
 import dev.isxander.yacl3.api.OptionDescription;
 import eu.pb4.entityviewdistance.modcompat.SodiumCompat;
-import me.jellysquid.mods.sodium.client.gui.options.Option;
-
 import java.util.Optional;
+
+//? if <1.21 {
+/^import me.jellysquid.mods.sodium.client.gui.options.Option;
+^///?} else {
+import net.caffeinemc.mods.sodium.client.gui.options.Option;
+//?}
 
 public class EntityViewDistanceCompat {
     public static Optional<dev.isxander.yacl3.api.Option<?>> convertFakeOption(Option<?> sodiumOption) {
@@ -20,3 +25,4 @@ public class EntityViewDistanceCompat {
         return Optional.empty();
     }
 }
+*///?}

@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'fabric-loom' version '1.7-SNAPSHOT'
 }
 
 version =  property("mod.version") + "+" + stonecutter.current.version
@@ -54,7 +54,9 @@ dependencies {
     // iris category placement
     modImplementation "maven.modrinth:iris:${property('deps.iris')}"
     // entityviewdistance button option compat
-    modImplementation "maven.modrinth:entity-view-distance:${property('deps.entity-view-distance')}"
+    if (stonecutter.eval(stonecutter.current.version, "<1.21")) {
+        modImplementation "maven.modrinth:entity-view-distance:${property('deps.entity-view-distance')}"
+    }
 
     modRuntimeOnly("maven.modrinth:cloth-config:${property('runtime.cloth')}")
     modRuntimeOnly("dev.lambdaurora:spruceui:${property('runtime.spruceui')}")
@@ -67,6 +69,7 @@ processResources {
     filesMatching("fabric.mod.json") {
         expand 'mod_version': project.version,
                 'target_minecraft': project.property('mod.target'),
+                'target_sodium': project.property("target.sodium"),
                 'target_fabricloader': project.property('deps.fabric_loader')
     }
 }

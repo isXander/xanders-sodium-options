@@ -30,7 +30,7 @@
   "depends": {
     "fabricloader": ">=${target_fabricloader}",
     "minecraft": "${target_minecraft}",
-    "sodium": "~0.5.0",
+    "sodium": "${target_sodium}",
     "yet_another_config_lib_v3": "~3.5.0"
   },
   "breaks": {

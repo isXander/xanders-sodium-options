@@ -2,11 +2,15 @@ package dev.isxander.xso.mixins;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import dev.isxander.xso.utils.ClassCapture;
-import me.jellysquid.mods.sodium.client.gui.options.OptionImpl;
-import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+
+//? if <1.21 {
+/*import me.jellysquid.mods.sodium.client.gui.options.OptionImpl;import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;*///?} else {
+import net.caffeinemc.mods.sodium.client.gui.options.OptionImpl;
+import net.caffeinemc.mods.sodium.client.gui.options.storage.OptionStorage;
+//?}
 
 @Mixin(value = OptionImpl.class, remap = false)
 public class OptionImplMixin<S, T> implements ClassCapture<T> {

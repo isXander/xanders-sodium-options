@@ -2,10 +2,14 @@ package dev.isxander.xso;
 
 import dev.isxander.xso.mixins.OptionImplAccessor;
 import dev.isxander.yacl3.api.Binding;
-import me.jellysquid.mods.sodium.client.gui.options.Option;
-import me.jellysquid.mods.sodium.client.gui.options.OptionImpl;
-import me.jellysquid.mods.sodium.client.gui.options.binding.OptionBinding;
-import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;
+
+//? if <1.21 {
+/*import me.jellysquid.mods.sodium.client.gui.options.Option;import me.jellysquid.mods.sodium.client.gui.options.OptionImpl;import me.jellysquid.mods.sodium.client.gui.options.binding.OptionBinding;import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;*///?} else {
+import net.caffeinemc.mods.sodium.client.gui.options.Option;
+import net.caffeinemc.mods.sodium.client.gui.options.OptionImpl;
+import net.caffeinemc.mods.sodium.client.gui.options.binding.OptionBinding;
+import net.caffeinemc.mods.sodium.client.gui.options.storage.OptionStorage;
+//?}
 
 public class SodiumBinding<S, T> implements Binding<T> {
     private final OptionBinding<S, T> sodiumBinding;
