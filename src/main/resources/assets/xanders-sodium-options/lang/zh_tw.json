@@ -1,0 +1,12 @@
+{
+  "xso.title": "Xander 的 Sodium 選項",
+  "xso.cfg.enabled": "XSO",
+  "xso.cfg.enabled.tooltip": "設定 XSO 是否應覆蓋 Sodium 的選項。停用時，您可以透過模組選單設定此模組。",
+  "xso.cfg.lenient_opts": "寬鬆選項",
+  "xso.cfg.lenient_opts.tooltip": "如果 XSO 無法轉換選項，它會在損壞的選項位置新增一個佔位符選項，而不是無法建立整個圖形介面，以便您可以在不相容的模組中繼續使用 XSO。",
+  "xso.cfg.hard_crash": "強制崩潰",
+  "xso.cfg.hard_crash.tooltip": "如果 XSO 無法轉換 Sodium 圖形介面，無論出於何種原因，啟用此選項會使 Minecraft 完全崩潰，而不是顯示警告並提供原始的 Sodium 圖形介面。這可能是有益的，因為它會使 Minecraft 產生崩潰報告，而停用此選項時它只會列印到 latest.log。",
+  
+  "xso.incompatible.button": "選項不相容",
+  "xso.incompatible.tooltip": "此選項目前與 XSO 不相容。請在 Github 上提出問題以取得支援！"
+  }
