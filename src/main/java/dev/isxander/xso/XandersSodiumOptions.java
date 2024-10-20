@@ -5,6 +5,7 @@ import dev.isxander.xso.config.XsoConfig;
 import dev.isxander.xso.mixins.CyclingControlAccessor;
 import dev.isxander.xso.mixins.SliderControlAccessor;
 import dev.isxander.xso.utils.ClassCapture;
+import dev.isxander.xso.utils.DonationPrompt;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.TickBoxControllerBuilder;
@@ -19,7 +20,9 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.TranslatableOption;
 
 //? if <1.21 {
-/*import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;import me.jellysquid.mods.sodium.client.gui.options.OptionPage;import me.jellysquid.mods.sodium.client.gui.options.TextProvider;import me.jellysquid.mods.sodium.client.gui.options.control.CyclingControl;import me.jellysquid.mods.sodium.client.gui.options.control.SliderControl;import me.jellysquid.mods.sodium.client.gui.options.control.TickBoxControl;import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;*///?} else {
+/*import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;import me.jellysquid.mods.sodium.client.gui.options.OptionPage;import me.jellysquid.mods.sodium.client.gui.options.TextProvider;import me.jellysquid.mods.sodium.client.gui.options.control.CyclingControl;import me.jellysquid.mods.sodium.client.gui.options.control.SliderControl;import me.jellysquid.mods.sodium.client.gui.options.control.TickBoxControl;import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;import me.jellysquid.mods.sodium.client.SodiumClientMod;
+import me.jellysquid.mods.sodium.client.data.fingerprint.HashedFingerprint;
+import me.jellysquid.mods.sodium.client.gui.SodiumGameOptions;*///?} else {
 import net.caffeinemc.mods.sodium.client.gui.SodiumOptionsGUI;
 import net.caffeinemc.mods.sodium.client.gui.options.OptionPage;
 import net.caffeinemc.mods.sodium.client.gui.options.TextProvider;
@@ -27,8 +30,14 @@ import net.caffeinemc.mods.sodium.client.gui.options.control.CyclingControl;
 import net.caffeinemc.mods.sodium.client.gui.options.control.SliderControl;
 import net.caffeinemc.mods.sodium.client.gui.options.control.TickBoxControl;
 import net.caffeinemc.mods.sodium.client.gui.options.storage.OptionStorage;
+import net.caffeinemc.mods.sodium.client.SodiumClientMod;
+import net.caffeinemc.mods.sodium.client.data.fingerprint.HashedFingerprint;
+import net.caffeinemc.mods.sodium.client.gui.SodiumGameOptions;
 //?}
 
+import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class XandersSodiumOptions {
@@ -52,6 +61,33 @@ public class XandersSodiumOptions {
 
                 XsoConfig.INSTANCE.save();
             });
+
+            var options = SodiumClientMod.options();
+            if (!options.notifications.hasSeenDonationPrompt) {
+                HashedFingerprint fingerprint = null;
+
+                try {
+                    fingerprint = HashedFingerprint.loadFromDisk();
+                } catch (Throwable var5) {
+                    Throwable t = var5;
+                    SodiumClientMod.logger().error("Failed to read the fingerprint from disk", t);
+                }
+
+                if (fingerprint != null) {
+                    Instant now = Instant.now();
+                    Instant threshold = Instant.ofEpochSecond(fingerprint.timestamp()).plus(3L, ChronoUnit.DAYS);
+                    if (now.isAfter(threshold)) {
+                        options.notifications.hasSeenDonationPrompt = true;
+                        try {
+                            SodiumGameOptions.writeToDisk(options);
+                        } catch (IOException var4) {
+                            IOException e = var4;
+                            SodiumClientMod.logger().error("Failed to update config file", e);
+                        }
+                        return new DonationPrompt(builder.build().generateScreen(prevScreen));
+                    }
+                }
+            }
 
             return builder.build().generateScreen(prevScreen);
         } catch (Exception e) {

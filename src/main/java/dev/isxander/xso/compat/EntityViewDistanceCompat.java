@@ -7,10 +7,10 @@ import eu.pb4.entityviewdistance.modcompat.SodiumCompat;
 import java.util.Optional;
 
 //? if <1.21 {
-/^import me.jellysquid.mods.sodium.client.gui.options.Option;
-^///?} else {
-import net.caffeinemc.mods.sodium.client.gui.options.Option;
-//?}
+import me.jellysquid.mods.sodium.client.gui.options.Option;
+//?} else {
+/^import net.caffeinemc.mods.sodium.client.gui.options.Option;
+^///?}
 
 public class EntityViewDistanceCompat {
     public static Optional<dev.isxander.yacl3.api.Option<?>> convertFakeOption(Option<?> sodiumOption) {
