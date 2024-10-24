@@ -1,4 +1,12 @@
 {
-  "xso.incompatible.button": "不兼容",
-  "xso.incompatible.tooltip": "此选项当前与XSO不兼容。请提出议题（github上的issue）以获得支持！"
+  "xso.title": "Xander's Sodium Options",
+  "xso.cfg.enabled": "XSO",
+  "xso.cfg.enabled.tooltip": "配置XSO是否应该覆盖钠的设置。当禁用时，你可以通过模组菜单配置这个模组。",
+  "xso.cfg.lenient_opts": "宽松的选项",
+  "xso.cfg.lenient_opts.tooltip": "如果XSO不能切换一个选项，而不是不能创建整个GUI，它会添加一个占位选项来代替被破坏的选项，所以你可以继续使用 XSO 与不兼容的模组。",
+  "xso.cfg.hard_crash": "硬崩溃",
+  "xso.cfg.hard_crash.tooltip": "如果XSO由于某种原因不能转换Sodium GUI，启用这个选项会使Minecraft完全崩溃，而不是显示警告并给你原来的Sodium GUI。这可能是有益的，因为它使Minecraft生成一份崩溃报告，而在关闭这个选项时，它只打印至latest.log。",
+
+  "xso.incompatible.button": "选项不兼容",
+  "xso.incompatible.tooltip": "这个选项目前与XSO不兼容。请提出issue以获得支持！"
 }
